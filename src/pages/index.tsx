@@ -2,6 +2,7 @@ import Head from 'next/head';
 // import Image from 'next/image'
 import { Inter } from '@next/font/google';
 import styles from '@/styles/Home.module.css';
+import SortAccordion from '@/components/Nav/SortAccordion';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -18,7 +19,10 @@ export default function Home() {
         <header className={styles.header}>
           <h1 className={inter.className}>popular movies</h1>
         </header>
-        <nav className={styles.nav}>nav</nav>
+        <nav className={styles.nav}>
+          nav
+          <SortAccordion />
+        </nav>
         <div className={styles.movies}>movies</div>
       </main>
     </>
