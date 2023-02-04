@@ -20,7 +20,6 @@ export default function Home() {
           <h1 className={inter.className}>popular movies</h1>
         </header>
         <nav className={styles.nav}>
-          nav
           <SortAccordion />
         </nav>
         <div className={styles.movies}>movies</div>

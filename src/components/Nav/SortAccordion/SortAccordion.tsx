@@ -4,7 +4,7 @@ import { ChevronDownIcon } from '@radix-ui/react-icons';
 
 export const SortAccordion = () => {
   return (
-    <Accordion.Root type="single" collapsible>
+    <Accordion.Root type="single" className="w72 border shadow-md rounded-md bg-white" collapsible>
       <Accordion.Item value="sort">
         <AccordionTrigger>Sort</AccordionTrigger>
         <AccordionContent>dropdown</AccordionContent>
@@ -15,10 +15,10 @@ export const SortAccordion = () => {
 
 // eslint-disable-next-line react/display-name
 const AccordionTrigger: FC<any> = React.forwardRef(({ children, className, ...props }, forwardedRef) => (
-  <Accordion.Header className="AccordionHeader">
-    <Accordion.Trigger {...props} ref={forwardedRef}>
+  <Accordion.Header className="flex">
+    <Accordion.Trigger className={className} {...props} ref={forwardedRef}>
       {children}
-      <ChevronDownIcon className="AccordionChevron" aria-hidden />
+      <ChevronDownIcon className="flex-1" aria-hidden />
     </Accordion.Trigger>
   </Accordion.Header>
 ));
