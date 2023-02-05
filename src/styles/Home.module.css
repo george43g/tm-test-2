@@ -1,17 +1,8 @@
 .main {
-  background-color: grey;
+  @apply bg-white max-w-screen-2xl gap-x-8;
   display: grid;
   min-height: 100vh;
-  column-gap: 1vmin;
-  row-gap: 1vmin;
-  margin: 0 2vmin;
-}
-
-.header,
-.nav,
-.movies {
-  border: 1px black solid;
-  box-sizing: border-box;
+  margin: 0 auto;
 }
 
 /* * Mobile Devices */
@@ -29,8 +20,8 @@
 /* * All Other Devices - NOTE: This could be done much more cleanly, but I'm limited on time... */
 @media only screen and (min-device-width: 812px) {
   .main {
-    grid-template-columns: 20vw 1fr;
-    grid-template-rows: 6rem 1fr;
+    grid-template-columns: 14vw 1fr;
+    grid-template-rows: 5rem 1fr;
     grid-template-areas:
       'header header'
       'nav movies';
@@ -39,17 +30,15 @@
 
 .nav {
   grid-area: nav;
-  background-color: green;
+  @apply flex flex-col gap-4;
 }
 
 .movies {
   grid-area: movies;
-  background-color: purple;
 }
 
 .header {
   grid-area: header;
-  background-color: brown;
   align-self: center;
 }
 
@@ -59,11 +48,27 @@
   font-size: 150%;
 }
 
-/* .main {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
-  padding: 6rem;
-  min-height: 100vh;
-} */
+.movies__grid {
+  @apply grid grid-cols-5 gap-9;
+  grid-auto-rows: max-content;
+}
+
+.movies__grid[data-end=true] {
+  @apply mb-8;
+}
+
+.load_more {
+  @apply mb-4 mt-8 bg-sky-500 text-white p-2 font-bold text-lg rounded-xl cursor-pointer transition-all hover:bg-sky-600;
+}
+
+.loading_more {
+  @apply mb-4 mt-8 bg-stone-200 text-white p-2 font-bold text-lg rounded-xl cursor-pointer transition-all animate-bounce;
+}
+
+.info_bar {
+  @apply w-full block grid grid-cols-1;
+}
+
+.error_box {
+  @apply bg-red-100 text-red-500 p-4 rounded-lg mt-8;
+}
