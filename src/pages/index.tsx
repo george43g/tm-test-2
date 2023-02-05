@@ -83,7 +83,7 @@ export default function Home({ serverMovies }: { serverMovies: MovieResult[] }) 
               <MovieCard
                 key={movie.id}
                 name={movie.title!}
-                image={`http://image.tmdb.org/t/p/w440_and_h660_face/${movie.poster_path}`}
+                image={`https://image.tmdb.org/t/p/w440_and_h660_face/${movie.poster_path}`}
                 date={movie.release_date!}
                 rating={(movie.vote_average! * 10).toFixed(0)}
               />
