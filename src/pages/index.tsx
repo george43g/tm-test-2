@@ -5,41 +5,37 @@ import styles from '@/styles/Home.module.css';
 import MovieCard from '@/components/MovieCard';
 import { SortAccordion, FilterAccordion, WatchAccordion } from '@/components/Nav';
 import { useEffect, useState } from 'react';
+// import { Movie } from '@/types';
+import type { MovieResult } from 'moviedb-promise';
 
 const inter = Inter({ subsets: ['latin'] });
 
-type Movie = {
-  id: string | number;
-  name: string;
-  image: string;
-  date: string;
-  rating: string;
-};
-
 export default function Home() {
-  const [movies, setMovies] = useState<Movie[]>([]);
+  const [movies, setMovies] = useState<MovieResult[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [endReached, setEndReached] = useState(false);
+  const [page, setPage] = useState(1);
 
   useEffect(() => fetchMovies(), []);
 
   const fetchMovies = () => {
     setLoading(true);
-    fetch('./api/movies?limit=20')
+    fetch(`./api/movies?page=${page}`)
       .then(response => response.json())
       .then(json => updateStates(json))
       .catch(err => {
         setLoading(false);
         setError(err.message);
-      });
+      })
+      .then(() => setPage(page + 1));
   };
 
-  const updateStates = (response: { movies: Movie[]; count: number }) => {
-    const _movies = [...movies, ...response.movies];
+  const updateStates = (response: MovieResult[]) => {
+    const _movies = [...movies, ...response];
     setError('');
     setMovies(_movies);
-    const reached = _movies.length >= response.count;
+    const reached = _movies.length >= 100;
     console.log({ reached });
     setEndReached(reached);
     setLoading(false);
@@ -64,8 +60,14 @@ export default function Home() {
         </nav>
         <div className="overflow-y-auto h-full">
           <div className={styles.movies__grid} data-end={endReached}>
-            {movies.map(({ id, name, image, date, rating }) => (
-              <MovieCard key={id} name={name} image={image} date={date} rating={rating} />
+            {movies.map(movie => (
+              <MovieCard
+                key={movie.id}
+                name={movie.title!}
+                image={`http://image.tmdb.org/t/p/w440_and_h660_face/${movie.poster_path}`}
+                date={movie.release_date!}
+                rating={(movie.vote_average! * 10).toFixed(0)}
+              />
             ))}
           </div>
           <div className={styles.info_bar}>
