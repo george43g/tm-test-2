@@ -1,31 +1,29 @@
 import Head from 'next/head';
 // import Image from 'next/image'
+import { GetServerSideProps } from 'next';
 import { Inter } from '@next/font/google';
 import styles from '@/styles/Home.module.css';
 import MovieCard from '@/components/MovieCard';
-import {
-  SortAccordion,
-  FilterAccordion,
-  type Value as AccordionValue,
-} from '@/components/Nav';
+import { SortAccordion, FilterAccordion, type Value as AccordionValue } from '@/components/Nav';
 import { useCallback, useEffect, useState } from 'react';
 import type { MovieResult } from 'moviedb-promise';
+import { getMovies } from '@/utils/getMovies';
 
 const inter = Inter({ subsets: ['latin'] });
 
 const initialFilter: AccordionValue = {
   movieRating: 0,
-  movieReleaseDate: "",
-  movieTitle: "",
-}
+  movieReleaseDate: '',
+  movieTitle: '',
+};
 
-export default function Home() {
-  const [movies, setMovies] = useState<MovieResult[]>([]);
-  const [loading, setLoading] = useState(true);
+export default function Home({ serverMovies }: { serverMovies: MovieResult[] }) {
+  const [movies, setMovies] = useState<MovieResult[]>(serverMovies);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [endReached, setEndReached] = useState(false);
-  const [page, setPage] = useState(1);
-  const [ filterValue, setFilterValue ] = useState<AccordionValue>(initialFilter)
+  const [page, setPage] = useState(2);
+  const [filterValue, setFilterValue] = useState<AccordionValue>(initialFilter);
 
   const fetchMovies = () => {
     setLoading(true);
@@ -48,29 +46,17 @@ export default function Home() {
     setLoading(false);
   };
 
-  useEffect(() => fetchMovies(), []);
-  
-  const handleFilterChange = useCallback(
-    (filterState: AccordionValue) => setFilterValue(filterState),
-    []
-  )
+  // useEffect(() => fetchMovies(), []);
 
-  const handleSearch = useCallback(
-    () => {
-      console.log({filterValue, movies})
-      const {
-        movieTitle = "",
-        movieRating,
-        movieReleaseDate
-      } = filterValue
-      const filteredMovies = movies.filter(
-        ({ title }) => title?.toLocaleLowerCase().includes(movieTitle.toLowerCase())
-      )
-      console.log({filteredMovies})
-      setMovies(filteredMovies)
-    },
-    []
-  )
+  const handleFilterChange = useCallback((filterState: AccordionValue) => setFilterValue(filterState), []);
+
+  const handleSearch = useCallback(() => {
+    console.log({ filterValue, movies });
+    const { movieTitle = '', movieRating, movieReleaseDate } = filterValue;
+    const filteredMovies = movies.filter(({ title }) => title?.toLocaleLowerCase().includes(movieTitle.toLowerCase()));
+    console.log({ filteredMovies });
+    setMovies(filteredMovies);
+  }, []);
 
   return (
     <>
@@ -86,16 +72,9 @@ export default function Home() {
         </header>
         <nav className={styles.nav}>
           <SortAccordion />
-          <FilterAccordion
-            initialValues={filterValue}
-            onChange={handleFilterChange}
-          />
-          <button
-              className={styles.btn_search}
-              type="button"
-              onClick={handleSearch}
-          >
-              Search
+          <FilterAccordion initialValues={filterValue} onChange={handleFilterChange} />
+          <button className={styles.btn_search} type="button" onClick={handleSearch}>
+            Search
           </button>
         </nav>
         <div className="overflow-y-auto h-full">
@@ -132,3 +111,13 @@ export default function Home() {
     </>
   );
 }
+
+export const getServerSideProps: GetServerSideProps<{ serverMovies: MovieResult[] }> = async context => {
+  const serverMovies: MovieResult[] = await getMovies(1);
+
+  return {
+    props: {
+      serverMovies,
+    },
+  };
+};
