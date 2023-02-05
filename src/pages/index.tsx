@@ -3,11 +3,52 @@ import Head from 'next/head';
 import { Inter } from '@next/font/google';
 import styles from '@/styles/Home.module.css';
 import MovieCard from '@/components/MovieCard';
-import SortAccordion from '@/components/Nav/SortAccordion';
+import {
+  SortAccordion,
+  FilterAccordion,
+  WatchAccordion,
+} from '@/components/Nav';
+import { useEffect, useState } from 'react';
 
 const inter = Inter({ subsets: ['latin'] });
 
+type Movie = {
+  id: string | number,
+  name: string,
+  image: string, 
+  date: string,
+  rating: string
+} 
+
 export default function Home() {
+  const [ movies, setMovies ] = useState<Movie[]>([])
+  const [ loading, setLoading ] = useState(true)
+  const [ error, setError ] = useState("")
+  const [ endReached, setEndReached ] = useState(false)
+
+  useEffect(() => fetchMovies(), [])
+  
+  const fetchMovies = () => {
+   setLoading(true)
+   fetch("./api/movies?limit=20") 
+    .then(response => response.json())
+    .then((json) => updateStates(json))
+    .catch((err) => {
+      setLoading(false)
+      setError(err.message)
+    })
+  }
+  
+  const updateStates = (response: { movies: Movie[], count: number}) => {
+    const _movies = [...movies, ...response.movies]
+    setError("")
+    setMovies(_movies)
+    const reached = _movies.length >= response.count
+    console.log({reached})
+    setEndReached(reached)
+    setLoading(false)
+  }
+
   return (
     <>
       <Head>
@@ -22,24 +63,40 @@ export default function Home() {
         </header>
         <nav className={styles.nav}>
           <SortAccordion />
+          <FilterAccordion />
+          <WatchAccordion />
         </nav>
-        <div>
-          <div className="grid grid-cols-5 gap-6">
-            {new Array(13).fill(1).map((_, idx) => (
+        <div className="overflow-y-auto h-full">
+          <div className={styles.movies__grid} data-end={endReached}>
+            {movies.map(({ id, name, image, date, rating}) => (
               <MovieCard
-                key={idx}
-                name="Some movie"
-                image="https://images.moviesanywhere.com/6305a9e8ed76d5fa485ac16637655cf7/bcc68be4-eede-409b-a63d-e179b28d19b4.webp?h=375&resize=fit&w=250"
-                date="12-12-2022"
-                rating="72"
+                key={id}
+                name={name}
+                image={image}
+                date={date}
+                rating={rating}
               />
             ))}
           </div>
-          <div className="grid grid-cols-1 my-4 ">
-            <button className="bg-sky-500 text-white p-2 font-bold text-lg rounded-xl cursor-pointer transition-all hover:bg-sky-600">
-              Load more
-            </button>
-          </div>
+            <div className={styles.info_bar}>
+              {error && (
+                <div className={styles.error_box}>{error}</div>
+              )}
+              {loading ? (
+                <button className={styles.loading_more} disabled>
+                  {/* @todo: use the unicode ellipse key here */}
+                  Loading...
+                </button>
+              ) : (
+                <>
+                  {!endReached && (
+                    <button className={styles.load_more} onClick={fetchMovies}>
+                      Load more
+                    </button>
+                  )}
+                </>
+              )}
+            </div>
         </div>
       </main>
     </>
