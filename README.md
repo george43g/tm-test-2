@@ -2,14 +2,16 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 
 ## Getting Started
 
-First, run the development server:
+Install the correct versions of npm and node, which have been pinned using Volta. You can find the versions listed in `package.json`
+
+To enforce conventional commits, commitizen & husky git hooks have been set up. Use either `git commit` or `git cz` to contribute commits before pushing.
+
+Once you have run `npm install`, set up your API key for TheMovieDB in `.env.local`. A sample file `sample.env.local` has been provided for reference.
+
+Then, run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
@@ -18,9 +20,15 @@ You can start editing the page by modifying `pages/index.tsx`. The page auto-upd
 
 [API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
 
+The default `hello.ts` endpoint has been removed, and replaced with a `movies.ts` endpoint.
+
 The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
 
 This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+
+## Deployment
+
+Simply merging or pushing changes onto the main branch will trigger a deployment with Vercel. This was chosen as a simple and fast solution to get this test up and running given limited time.
 
 ## Learn More
 
