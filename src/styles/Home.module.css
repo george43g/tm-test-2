@@ -3,12 +3,12 @@
   display: grid;
   min-height: 100vh;
   margin: 0 auto;
+  padding: 1vmin;
 }
 
 /* * Mobile Devices */
-@media only screen and (min-device-width: 375px) and (max-device-width: 812px) {
+@media only screen and (max-device-width: 812px) {
   .main {
-    margin: 1vmin;
     grid-template-columns: 1fr;
     grid-template-rows: 3rem minmax(25vh, min-content) auto;
     grid-template-areas:
@@ -16,12 +16,16 @@
       'nav'
       'movies';
   }
+  .movies__grid {
+    @apply grid grid-cols-2 gap-3 !important;
+  }
+
 }
 
 /* * All Other Devices - NOTE: This could be done much more cleanly, but I'm limited on time... */
 @media only screen and (min-device-width: 812px) {
   .main {
-    grid-template-columns: 14vw 1fr;
+    grid-template-columns: minmax(17rem, min-content) 1fr;
     grid-template-rows: 5rem 1fr;
     grid-template-areas:
       'header header'
@@ -31,7 +35,7 @@
 
 .nav {
   grid-area: nav;
-  @apply flex flex-col gap-4;
+  @apply flex flex-col gap-4 mb-4 min-w-fit;
 }
 
 .movies {
