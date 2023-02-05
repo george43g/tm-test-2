@@ -1,3 +1,2 @@
 export { SortAccordion } from './SortAccordion/SortAccordion';
-export { WatchAccordion } from './WatchAccordion/WatchAccordion';
-export { FilterAccordion } from './FilterAccordion/FilterAccordion';
+export { FilterAccordion, type Value } from './FilterAccordion/FilterAccordion';

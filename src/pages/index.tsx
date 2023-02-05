@@ -3,12 +3,21 @@ import Head from 'next/head';
 import { Inter } from '@next/font/google';
 import styles from '@/styles/Home.module.css';
 import MovieCard from '@/components/MovieCard';
-import { SortAccordion, FilterAccordion, WatchAccordion } from '@/components/Nav';
-import { useEffect, useState } from 'react';
-// import { Movie } from '@/types';
+import {
+  SortAccordion,
+  FilterAccordion,
+  type Value as AccordionValue,
+} from '@/components/Nav';
+import { useCallback, useEffect, useState } from 'react';
 import type { MovieResult } from 'moviedb-promise';
 
 const inter = Inter({ subsets: ['latin'] });
+
+const initialFilter: AccordionValue = {
+  movieRating: 0,
+  movieReleaseDate: "",
+  movieTitle: "",
+}
 
 export default function Home() {
   const [movies, setMovies] = useState<MovieResult[]>([]);
@@ -16,8 +25,7 @@ export default function Home() {
   const [error, setError] = useState('');
   const [endReached, setEndReached] = useState(false);
   const [page, setPage] = useState(1);
-
-  useEffect(() => fetchMovies(), []);
+  const [ filterValue, setFilterValue ] = useState<AccordionValue>(initialFilter)
 
   const fetchMovies = () => {
     setLoading(true);
@@ -36,10 +44,33 @@ export default function Home() {
     setError('');
     setMovies(_movies);
     const reached = _movies.length >= 100;
-    console.log({ reached });
     setEndReached(reached);
     setLoading(false);
   };
+
+  useEffect(() => fetchMovies(), []);
+  
+  const handleFilterChange = useCallback(
+    (filterState: AccordionValue) => setFilterValue(filterState),
+    []
+  )
+
+  const handleSearch = useCallback(
+    () => {
+      console.log({filterValue, movies})
+      const {
+        movieTitle = "",
+        movieRating,
+        movieReleaseDate
+      } = filterValue
+      const filteredMovies = movies.filter(
+        ({ title }) => title?.toLocaleLowerCase().includes(movieTitle.toLowerCase())
+      )
+      console.log({filteredMovies})
+      setMovies(filteredMovies)
+    },
+    []
+  )
 
   return (
     <>
@@ -55,8 +86,17 @@ export default function Home() {
         </header>
         <nav className={styles.nav}>
           <SortAccordion />
-          <FilterAccordion />
-          <WatchAccordion />
+          <FilterAccordion
+            initialValues={filterValue}
+            onChange={handleFilterChange}
+          />
+          <button
+              className={styles.btn_search}
+              type="button"
+              onClick={handleSearch}
+          >
+              Search
+          </button>
         </nav>
         <div className="overflow-y-auto h-full">
           <div className={styles.movies__grid} data-end={endReached}>

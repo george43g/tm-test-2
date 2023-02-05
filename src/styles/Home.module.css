@@ -77,3 +77,8 @@
 .error_box {
   @apply bg-red-100 text-red-500 p-4 rounded-lg mt-8;
 }
+
+.btn_search {
+    @apply rounded-full bg-stone-100 p-2 flex items-center justify-center font-bold;
+    @apply hover:bg-stone-200 focus:bg-stone-200 active:bg-stone-200 text-lg text-gray-500;
+}
