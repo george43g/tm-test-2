@@ -1,7 +1,7 @@
 import { useState, type FC, useCallback } from "react"
 import { Accordion } from "../../Accordion/Accordion"
 
-import styles from "./SortAccordion.module.css"
+import styles from "./WatchAccordion.module.css"
 import { Select } from "@/components/Select/Select"
 
 const sortOptions = [
@@ -14,9 +14,9 @@ const sortOptions = [
     { value: "title_a_to_z", label: "Title (A-Z)" },
 ]
 
-type SortAccordionProps  = any
+type WatchAccordionProps  = any
 
-export const SortAccordion: FC<SortAccordionProps> = () => {
+export const WatchAccordion: FC<WatchAccordionProps> = () => {
     const [ selectedOption, setSelectedOption ] = useState<string>(sortOptions[0].value)
     
     const handleOnSelectChange = useCallback(
@@ -24,9 +24,9 @@ export const SortAccordion: FC<SortAccordionProps> = () => {
         []
     )
     return (
-        <Accordion title="Sort">
+        <Accordion title="Where To Watch">
             <div className={styles.content}>
-                <span className="font-light">Sort Results By</span>
+                <span>Sort Results By</span>
                 <Select
                     placeholder="Select an option"
                     options={sortOptions}

@@ -1,0 +1,19 @@
+.trigger {
+    @apply w-[235px] bg-gray-400 bg-opacity-60 rounded flex items-center justify-between px-4 py-2 text-sm;
+}
+
+.content {
+    @apply w-[235px] bg-white border border-stone-300 rounded-lg py-2;
+}
+
+.item {
+    @apply w-[235px] overflow-ellipsis text-ellipsis py-1 px-4 text-left cursor-pointer text-sm;
+}
+
+.item[data-highlighted] {
+   @apply bg-stone-100; 
+}
+
+.selectedItem {
+   @apply font-bold bg-opacity-70 bg-stone-200; 
+}

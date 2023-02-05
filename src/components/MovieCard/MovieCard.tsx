@@ -1,10 +1,10 @@
-import { AvatarIcon } from '@radix-ui/react-icons';
 import React, { FC } from 'react';
 import { MovieCardProps } from './types';
+import styles from "./MovieCard.module.css"
 
 export const MovieCard: FC<MovieCardProps> = ({ name, image, date, rating }) => {
   return (
-    <div className="flex flex-col bg-white rounded-lg overflow-hidden shadow-lg">
+    <div className={styles.container}>
       <img src={image} alt={`${name}-cover`} className="object-cover h-72 relative" />
       <div className="p-3">
         <div className="bg-black text-white rounded-full h-10 w-10 flex justify-center items-center absolute -mt-7">

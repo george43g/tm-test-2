@@ -1,0 +1,37 @@
+.root {
+    @apply border border-stone-200 shadow-md rounded-lg;
+    @apply bg-white shadow-md;
+}
+
+.item{
+
+}
+
+.triggerHeader {
+    @apply px-4 py-3 border-stone-200;
+}
+
+.triggerHeader[data-state=open] {
+    @apply border-b;
+}
+
+.trigger[data-state=open] > .triggerIcon {
+    transform: rotate(90deg);
+}
+
+.trigger {
+    @apply font-bold text-lg flex justify-between items-center;
+    @apply w-full;
+}
+
+.triggerIcon {
+    @apply font-bold text-lg;
+    transition: transform 0.3s cubic-bezier(0.075, 0.82, 0.165, 1);
+}
+
+.content {
+}
+
+.content[data-state=open] {
+    @apply px-4 py-3 flex flex-col gap-3;
+}
