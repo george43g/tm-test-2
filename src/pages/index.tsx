@@ -7,6 +7,7 @@ import { SortAccordion, FilterAccordion, type Value as AccordionValue, SortOptio
 import { FormEventHandler, useCallback, useState } from 'react';
 import type { MovieResult } from 'moviedb-promise';
 import { getMovies } from '@/utils/getMovies';
+import MovieInfoWrapper from '@/components/MovieInfoWrapper';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -55,6 +56,7 @@ export default function Home({ serverMovies }: { serverMovies: MovieResult[] }) 
       setLoading(false);
     }
   };
+
 
   const handleFilterChange = useCallback((filterState: AccordionValue) => setFilterValue(filterState), []);
   const handleSortChange = useCallback(
@@ -161,6 +163,7 @@ export default function Home({ serverMovies }: { serverMovies: MovieResult[] }) 
           <div className={styles.movies__grid} data-end={endReached}>
             {filteredMovies.map(movie => (
               <MovieCard
+                id={movie.id!}
                 key={movie.id}
                 name={movie.title!}
                 image={`https://image.tmdb.org/t/p/w440_and_h660_face/${movie.poster_path}`}

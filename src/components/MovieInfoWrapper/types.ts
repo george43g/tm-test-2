@@ -1,3 +1,5 @@
 import { PropsWithChildren } from 'react';
 
-export type MovieInfoWrapperProps = PropsWithChildren;
+export type MovieInfoWrapperProps = PropsWithChildren & {
+  id: number;
+};
