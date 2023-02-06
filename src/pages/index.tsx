@@ -1,11 +1,10 @@
 import Head from 'next/head';
-// import Image from 'next/image'
 import { GetServerSideProps } from 'next';
 import { Inter } from '@next/font/google';
 import styles from '@/styles/Home.module.css';
 import MovieCard from '@/components/MovieCard';
-import { SortAccordion, FilterAccordion, type Value as AccordionValue } from '@/components/Nav';
-import { useCallback, useEffect, useState } from 'react';
+import { SortAccordion, FilterAccordion, type Value as AccordionValue, SortOption } from '@/components/Nav';
+import { FormEventHandler, useCallback, useState } from 'react';
 import type { MovieResult } from 'moviedb-promise';
 import { getMovies } from '@/utils/getMovies';
 
@@ -24,6 +23,8 @@ export default function Home({ serverMovies }: { serverMovies: MovieResult[] }) 
   const [endReached, setEndReached] = useState(false);
   const [page, setPage] = useState(2);
   const [filterValue, setFilterValue] = useState<AccordionValue>(initialFilter);
+  const [filteredMovies, setFilteredMovies] = useState<MovieResult[]>(serverMovies);
+  const [sortOption, setSortOPtion] = useState("popularity:desc")
 
   const fetchMovies = () => {
     setLoading(true);
@@ -37,26 +38,97 @@ export default function Home({ serverMovies }: { serverMovies: MovieResult[] }) 
       .then(() => setPage(page + 1));
   };
 
-  const updateStates = (response: MovieResult[]) => {
-    const _movies = [...movies, ...response];
-    setError('');
-    setMovies(_movies);
-    const reached = _movies.length >= 100;
-    setEndReached(reached);
-    setLoading(false);
+  const updateStates = (response: MovieResult[] | { success: false, message: string }) => {
+    if (!Array.isArray(response)) {
+      setEndReached(true)
+      if (!response.message.includes("422"))
+        setError(response.message)
+      setLoading(false)
+    } else {
+      let _movies = [...movies, ...response];
+      _movies = sortMovies(_movies, sortOption)
+      setError('');
+      setMovies(_movies);
+      // loading more doesn't take into account the current filter.
+      // it takes into account only sorting.
+      setFilteredMovies(_movies)
+      setLoading(false);
+    }
   };
 
-  // useEffect(() => fetchMovies(), []);
-
   const handleFilterChange = useCallback((filterState: AccordionValue) => setFilterValue(filterState), []);
+  const handleSortChange = useCallback(
+    (sortValue: string) => {
+      setSortOPtion(sortValue)
+      const sortedAllMovies = sortMovies(movies, sortValue)
+      setMovies(sortedAllMovies)
+      const sortedMovies = sortMovies(filteredMovies, sortValue)
+      setFilteredMovies(sortedMovies)
+    },
+    [movies, filteredMovies]
+  );
 
-  const handleSearch = useCallback(() => {
-    console.log({ filterValue, movies });
+  const handleSearch = useCallback<FormEventHandler<HTMLFormElement>>((event) => {
+    event.preventDefault()
     const { movieTitle = '', movieRating, movieReleaseDate } = filterValue;
-    const filteredMovies = movies.filter(({ title }) => title?.toLocaleLowerCase().includes(movieTitle.toLowerCase()));
-    console.log({ filteredMovies });
-    setMovies(filteredMovies);
-  }, []);
+
+    let titleFilteredMovies = movies
+    if (movieTitle)
+      titleFilteredMovies = movies.filter(
+        ({ title, original_title }) => `${title} ${original_title}`?.toLocaleLowerCase().includes(movieTitle.toLowerCase())
+      );
+    
+    let ratingFilteredMovies = titleFilteredMovies
+    if (movieRating)
+      ratingFilteredMovies = titleFilteredMovies.filter(
+        ({ vote_average }) => {
+          if (+movieRating < 0)
+            return vote_average! <= Math.abs(+movieRating!)
+          return vote_average! >= +movieRating!
+        }
+      )
+    
+    let releaseDateFilteredMovies = ratingFilteredMovies
+    if (movieReleaseDate)
+      releaseDateFilteredMovies = ratingFilteredMovies.filter(
+        ({ release_date }) => release_date && new Date(release_date).getTime() >= new Date(movieReleaseDate).getTime()
+      )
+    console.log({ movies, releaseDateFilteredMovies });
+
+    const sortedMovies = sortMovies(releaseDateFilteredMovies, sortOption)
+    setFilteredMovies(sortedMovies)
+  }, [movies, filterValue, sortOption]);
+  
+  const sortMovies = <T extends MovieResult>(_movies: T[], _sortOption: SortOption["value"]) => {
+    const [ sortProp, sortOrder="" ] = _sortOption.split(":")
+    const comesFirstPerSortOrder = sortOrder !== "desc" ? -1 : 1
+    const comesLastPerSortOrder = sortOrder !== "desc" ? 1 : -1
+    switch(sortProp) {
+      case "release_date": {
+        return _movies.sort(
+          (movieA, movieB) => new Date(movieA.release_date!) < new Date(movieB.release_date!) ? comesFirstPerSortOrder : comesLastPerSortOrder
+        )
+      }
+      case "title": {
+        return _movies.sort(
+          (movieA: T, movieB: T) => movieA.title! < movieB.title! ? comesFirstPerSortOrder : comesLastPerSortOrder
+        )
+      }
+      case "vote_average": {
+        return _movies.sort(
+          (movieA: T, movieB: T) => movieA.vote_average! < movieB.vote_average! ? comesFirstPerSortOrder : comesLastPerSortOrder
+        )
+      }
+      case "popularity": {
+        return _movies.sort(
+          (movieA: T, movieB: T) => movieA.popularity! < movieB.popularity! ? comesFirstPerSortOrder : comesLastPerSortOrder
+        )
+      }
+      default: {
+        return _movies
+      }
+    }
+  }
 
   return (
     <>
@@ -71,15 +143,23 @@ export default function Home({ serverMovies }: { serverMovies: MovieResult[] }) 
           <h1 className={inter.className}>popular movies</h1>
         </header>
         <nav className={styles.nav}>
-          <SortAccordion />
-          <FilterAccordion initialValues={filterValue} onChange={handleFilterChange} />
-          <button className={styles.btn_search} type="button" onClick={handleSearch}>
-            Search
-          </button>
+          <form onSubmit={handleSearch} className="contents">
+            <SortAccordion
+              initialValue={sortOption}
+              onChange={handleSortChange}
+            />
+            <FilterAccordion
+              initialValues={filterValue}
+              onChange={handleFilterChange}
+            />
+            <button className={styles.btn_search} type="submit">
+              Search
+            </button>
+          </form>
         </nav>
         <div className="overflow-y-auto h-full">
           <div className={styles.movies__grid} data-end={endReached}>
-            {movies.map(movie => (
+            {filteredMovies.map(movie => (
               <MovieCard
                 key={movie.id}
                 name={movie.title!}

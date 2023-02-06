@@ -1,28 +1,28 @@
-import { useState, type FC, useCallback } from "react"
+import { type FC } from "react"
 import { Accordion } from "../../Accordion/Accordion"
 
 import styles from "./SortAccordion.module.css"
 import { Select } from "@/components/Select/Select"
 
 const sortOptions = [
-    { value: "popularity_desc", label: "Popularity Descending" },
-    { value: "popularity_asc", label: "Popularity Ascending" },
-    { value: "rating_desc", label: "Rating Descending" },
-    { value: "rating_asc", label: "Rating Ascending" },
-    { value: "release_date_desc", label: "Release Date Descending" },
-    { value: "release_date_asc", label: "Release Date Ascending" },
-    { value: "title_a_to_z", label: "Title (A-Z)" },
+    { value: "popularity:desc", label: "Popularity Descending" },
+    { value: "popularity:asc", label: "Popularity Ascending" },
+    { value: "vote_average:desc", label: "Rating Descending" },
+    { value: "vote_average:asc", label: "Rating Ascending" },
+    { value: "release_date:desc", label: "Release Date Descending" },
+    { value: "release_date:asc", label: "Release Date Ascending" },
+    { value: "title", label: "Title (A-Z)" },
 ]
 
-type SortAccordionProps  = any
+export type SortOption = (typeof sortOptions)[number]
 
-export const SortAccordion: FC<SortAccordionProps> = () => {
-    const [ selectedOption, setSelectedOption ] = useState<string>(sortOptions[0].value)
-    
-    const handleOnSelectChange = useCallback(
-        (value: string) => setSelectedOption(value),
-        []
-    )
+type SortAccordionProps  = {
+    onChange: (value: string) => void
+    initialValue: SortOption["value"]
+}
+
+export const SortAccordion: FC<SortAccordionProps> = (props) => {
+    const {onChange, initialValue} = props
     return (
         <Accordion title="Sort">
             <div className={styles.content}>
@@ -30,8 +30,8 @@ export const SortAccordion: FC<SortAccordionProps> = () => {
                 <Select
                     placeholder="Select an option"
                     options={sortOptions}
-                    initialValue={selectedOption}
-                    onChange={handleOnSelectChange}
+                    initialValue={initialValue ?? sortOptions[0].value}
+                    onChange={onChange}
                 />
             </div>
         </Accordion>
