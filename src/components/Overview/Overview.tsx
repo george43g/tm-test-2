@@ -4,8 +4,10 @@ import { OverviewProps } from './types';
 export const Overview: FC<OverviewProps> = ({ title, content, className }) => {
   return (
     <div className={`${className ? className : ''}`}>
-      <h4 className="font-semibold">{title}</h4>
-      <p>{content}</p>
+      <span className="font-semibold">{title}</span>
+      <br />
+      {/* Canont use p or h elements as this causes a console error */}
+      <span>{content}</span>
     </div>
   );
 };
