@@ -14,8 +14,11 @@ export default async function handler(
     const page = parseInt(req.query.page, 10);
     const results = await getMovies(page);
     return res.status(200).json(results);
-  } catch (e) {
-    console.error(e);
-    return res.status(500).send({ success: false, message: e.message });
+  } catch (error) {
+    console.error(error);
+    let message;
+    if (error instanceof Error) message = error.message;
+    else message = String(error);
+    return res.status(500).send({ success: false, message });
   }
 }
